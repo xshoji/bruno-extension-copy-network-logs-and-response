@@ -88,6 +88,7 @@
         .map(t => t.startsWith("text-yellow-500@@@@Current time is") ? "Current time is " + Utils.formatDate(t.replace("text-yellow-500@@@@Current time is ", "")) : t)
         .map(t => t.startsWith("text-yellow") ? "" : t)
         .map(t => t.startsWith("text-purple") ? "" : t)
+        .map(t => t.startsWith("text-red") ? t.replace(/text-red-[0-9]*@@@@/g, "") : t)
         .map(t => t.startsWith("text-blue") ? t.replace(/text-blue-[0-9]*@@@@/g, "") : t)
         .map(t => t.startsWith("text-gray") ? t.replace(/text-gray-[0-9]*@@@@/g, "") : t)
         .map(t => t.startsWith("text-green") ? t.replace(/text-green-[0-9]*@@@@/g, "") : t)
