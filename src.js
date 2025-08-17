@@ -5,7 +5,7 @@
     setSeparator: "",
 
     hideConnectionProcessDetails: true,
-    maskingLogFiledRegex: /([Cc]ookie:|[Aa]uthorization: Bearer|access_token|refresh_token|client_secret)(.*)/g,
+    maskingLogFieldRegex: /([Cc]ookie:|[Aa]uthorization: Bearer|access_token|refresh_token|client_secret)(.*)/g,
 
     waitTimeForInitialization: 3000,
     buttonPosition: "Safe Mode",
@@ -32,7 +32,7 @@
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${weekday[d.getDay()]} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     },
 
-    maskSensitiveInfo: text => text.replaceAll(Config.maskingLogFiledRegex, "$1 ****")
+    maskSensitiveInfo: text => text.replaceAll(Config.maskingLogFieldRegex, "$1 ****")
   };
 
   // DOM operation functions
@@ -88,9 +88,9 @@
         .map(t => t.startsWith("text-yellow-500@@@@Current time is") ? "Current time is " + Utils.formatDate(t.replace("text-yellow-500@@@@Current time is ", "")) : t)
         .map(t => t.startsWith("text-yellow") ? "" : t)
         .map(t => t.startsWith("text-purple") ? "" : t)
-        .map(t => t.startsWith("text-blue")   ? t.replace(/text-blue-[0-9]*@@@@/g, "") : t)
-        .map(t => t.startsWith("text-gray")   ? t.replace(/text-gray-[0-9]*@@@@/g, "") : t)
-        .map(t => t.startsWith("text-green")  ? t.replace(/text-green-[0-9]*@@@@/g, "") : t)
+        .map(t => t.startsWith("text-blue") ? t.replace(/text-blue-[0-9]*@@@@/g, "") : t)
+        .map(t => t.startsWith("text-gray") ? t.replace(/text-gray-[0-9]*@@@@/g, "") : t)
+        .map(t => t.startsWith("text-green") ? t.replace(/text-green-[0-9]*@@@@/g, "") : t)
         .filter(t => t !== "> ")
         .filter(t => t !== "")
         .map(t => t.startsWith("mt-4") ? "" : t)
