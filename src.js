@@ -4,10 +4,11 @@
     ExtensionName: "bruno-extension-copy-network-logs-and-response",
     setSeparator: "",
 
-    hideConnectionProcessDetails: true,
+    includeApplicationMessage: false,
+    includeConnectionProcessDetails: false,
     maskingLogFieldRegex: /([Cc]ookie:|[Aa]uthorization: Bearer|access_token|refresh_token|client_secret)(.*)/g,
 
-    waitTimeForInitialization: 3000,
+    waitTimeForInitialization: 500,
     buttonPosition: "Safe Mode",
     buttonText: "Copy",
   };
@@ -83,10 +84,10 @@
     getNetworkLogs: async () => {
       return Array.from(document.getElementsByClassName("whitespace-pre-wrap")[0].children)
         .map(e => e.className + "@@@@" + e.textContent)
-        //.map(t => t.startsWith("text-yellow") ? t.replace(/text-yellow-[0-9]*@@@@/g, "+ ") : t)
-        //.map(t => t.startsWith("text-purple") ? t.replace(/text-purple-[0-9]*@@@@/g, "* ") : t)
         .map(t => t.startsWith("text-yellow-500@@@@Current time is") ? "Current time is " + Utils.formatDate(t.replace("text-yellow-500@@@@Current time is ", "")) : t)
+        .map(t => t.startsWith("text-yellow") && Config.includeApplicationMessage ? t.replace(/text-yellow-[0-9]*@@@@/g, "# ") : t)
         .map(t => t.startsWith("text-yellow") ? "" : t)
+        .map(t => t.startsWith("text-purple") && Config.includeConnectionProcessDetails ? t.replace(/text-purple-[0-9]*@@@@/g, "* ") : t)
         .map(t => t.startsWith("text-purple") ? "" : t)
         .map(t => t.startsWith("text-red") ? t.replace(/text-red-[0-9]*@@@@/g, "") : t)
         .map(t => t.startsWith("text-blue") ? t.replace(/text-blue-[0-9]*@@@@/g, "") : t)
@@ -117,57 +118,57 @@
 
     // Define CSS
     Utils.appendCss(`
-      .${Config.ExtensionName}-icon {
-        box-sizing: border-box;
-        display: inline-block;
-        font-size: inherit;
-        font-style: normal;
-        height: 1em;
-        position: relative;
-        text-indent: -9999px;
-        vertical-align: middle;
-        width: 1em;
-      }
-      
-      .${Config.ExtensionName}-icon::before,
-      .${Config.ExtensionName}-icon::after {
-        content: "";
-        display: block;
-        left: 50%;
-        position: absolute;
-        top: 50%;
-        transform: translate(-50%, -50%);
-      }
-      
-      .${Config.ExtensionName}-icon-copy::before {
-        border: .1rem solid currentColor;
-        border-bottom-color: transparent;
-        border-radius: .1em;
-        border-right-color: transparent;
-        height: .8em;
-        left: 40%;
-        top: 40%;
-        width: .7em;
-      }
-      
-      .${Config.ExtensionName}-icon-copy::after {
-        border: .1rem solid currentColor;
-        border-radius: .1em;
-        height: .8em;
-        left: 60%;
-        top: 60%;
-        width: .7em;
-      }
-    `);
+        .${Config.ExtensionName}-icon {
+          box-sizing: border-box;
+          display: inline-block;
+          font-size: inherit;
+          font-style: normal;
+          height: 1em;
+          position: relative;
+          text-indent: -9999px;
+          vertical-align: middle;
+          width: 1em;
+        }
+        
+        .${Config.ExtensionName}-icon::before,
+        .${Config.ExtensionName}-icon::after {
+          content: "";
+          display: block;
+          left: 50%;
+          position: absolute;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        }
+        
+        .${Config.ExtensionName}-icon-copy::before {
+          border: .1rem solid currentColor;
+          border-bottom-color: transparent;
+          border-radius: .1em;
+          border-right-color: transparent;
+          height: .8em;
+          left: 40%;
+          top: 40%;
+          width: .7em;
+        }
+        
+        .${Config.ExtensionName}-icon-copy::after {
+          border: .1rem solid currentColor;
+          border-radius: .1em;
+          height: .8em;
+          left: 60%;
+          top: 60%;
+          width: .7em;
+        }
+      `);
 
     // Create button element
     copyButton.style.cssText = "display: flex;";
     copyButton.innerHTML = `
-    <button style="margin-left: 5px;padding: 2px 10px 2px 10px;color: #FFF;background: rgb(130 130 130 / 35%); display: flex; justify-content: center; align-items: center;">
-      <div class="${Config.ExtensionName}-icon ${Config.ExtensionName}-icon-copy" style="margin: 2px 5px 0px 3px"></div>
-      <div style="display: flex; justify-content: center; align-items: center;">${Config.buttonText}</div>
-    </button>
-    `;
+      <button style="margin-left: 5px;padding: 2px 10px 2px 10px;color: #FFF;background: rgb(130 130 130 / 35%); display: flex; justify-content: center; align-items: center;">
+        <div class="${Config.ExtensionName}-icon ${Config.ExtensionName}-icon-copy" style="margin: 2px 5px 0px 3px"></div>
+        <div style="display: flex; justify-content: center; align-items: center;">${Config.buttonText}</div>
+      </button>
+      `;
 
     // Data collection process
     const processData = async () => {
