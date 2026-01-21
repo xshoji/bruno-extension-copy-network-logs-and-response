@@ -9,7 +9,7 @@
     maskingLogFieldRegex: /([Cc]ookie:|[Aa]uthorization: Bearer|access_token|refresh_token|client_secret)(.*)/g,
 
     waitTimeForInitialization: 500,
-    buttonPosition: "Safe Mode",
+    buttonPosition: "Collections",
     buttonText: "Copy",
   };
 
@@ -71,7 +71,7 @@
         const node = document.evaluate('//*[not(contains(name(), "script")) and contains(text(), "' + referenceText + '")]',
           document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotItem(0);
         if (node?.parentNode) {
-          node.parentNode.insertBefore(element, node.nextSibling);
+          node.appendChild(element);
           return true;
         }
       } catch (e) { console.error("Failed to insert element:", e); }
@@ -82,20 +82,20 @@
   // Data processing functions
   const DataProcessor = {
     getNetworkLogs: async () => {
-      return Array.from(document.getElementsByClassName("whitespace-pre-wrap")[0].children)
+      return Array.from(document.getElementsByClassName("network-logs-pre")[0].children)
+        .flatMap(e => Array.from(e.children))
         .map(e => e.className + "@@@@" + e.textContent)
-        .map(t => t.startsWith("text-yellow-500@@@@Current time is") ? "Current time is " + Utils.formatDate(t.replace("text-yellow-500@@@@Current time is ", "")) : t)
-        .map(t => t.startsWith("text-yellow") && Config.includeApplicationMessage ? t.replace(/text-yellow-[0-9]*@@@@/g, "# ") : t)
-        .map(t => t.startsWith("text-yellow") ? "" : t)
-        .map(t => t.startsWith("text-purple") && Config.includeConnectionProcessDetails ? t.replace(/text-purple-[0-9]*@@@@/g, "* ") : t)
-        .map(t => t.startsWith("text-purple") ? "" : t)
-        .map(t => t.startsWith("text-red") ? t.replace(/text-red-[0-9]*@@@@/g, "") : t)
-        .map(t => t.startsWith("text-blue") ? t.replace(/text-blue-[0-9]*@@@@/g, "") : t)
-        .map(t => t.startsWith("text-gray") ? t.replace(/text-gray-[0-9]*@@@@/g, "") : t)
-        .map(t => t.startsWith("text-green") ? t.replace(/text-green-[0-9]*@@@@/g, "") : t)
+        .map(t => t.replace(/^network-logs-entry@@@@$/g, ""))
+        .map(t => t.replace(/^network-logs-spacing@@@@$/g, "\n"))
+        .map(t => t.startsWith("network-logs-entry network-logs-entry--info@@@@Current time is") ? "Current time is " + Utils.formatDate(t.replace("network-logs-entry network-logs-entry--info@@@@Current time is ", "")) : t)
+        .map(t => t.replace(/^network-logs-entry network-logs-entry--request@@@@/g, ""))
+        .map(t => t.replace(/^network-logs-entry network-logs-entry--response@@@@/g, ""))
+        .map(t => t.startsWith("network-logs-entry network-logs-entry--info@@@@") ? Config.includeApplicationMessage ? t.replace(/network-logs-entry network-logs-entry--info@@@@/g, "# ") : "" : t)
+        .map(t => t.startsWith("network-logs-entry network-logs-entry--tls@@@@") ? Config.includeApplicationMessage ? t.replace(/network-logs-entry network-logs-entry--tls@@@@/g, "* ") : "" : t)
+        .map(t => t.replace(/^network-logs-entry@@@@/g, ""))
         .filter(t => t !== "> ")
         .filter(t => t !== "")
-        .map(t => t.startsWith("mt-4") ? "" : t)
+        .map(t => t.startsWith("mt-4") ? "" : t) // いらないかも
         .join("\n")
         .replace(/^\n/, "");
     },
@@ -196,6 +196,11 @@
         console.error("Data collection process failed:", e);
       }
     };
+
+    // Disable other click event
+    copyButton.addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
 
     // Set click event
     copyButton.addEventListener("click", processData);
