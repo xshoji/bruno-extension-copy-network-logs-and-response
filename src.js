@@ -85,17 +85,16 @@
       return Array.from(document.getElementsByClassName("network-logs-pre")[0].children)
         .flatMap(e => Array.from(e.children))
         .map(e => e.className + "@@@@" + e.textContent)
-        .map(t => t.replace(/^network-logs-entry@@@@$/g, ""))
-        .map(t => t.replace(/^network-logs-spacing@@@@$/g, "\n"))
         .map(t => t.startsWith("network-logs-entry network-logs-entry--info@@@@Current time is") ? "Current time is " + Utils.formatDate(t.replace("network-logs-entry network-logs-entry--info@@@@Current time is ", "")) : t)
+        .map(t => t.startsWith("network-logs-entry network-logs-entry--info@@@@") ? Config.includeApplicationMessage ? t.replace(/network-logs-entry network-logs-entry--info@@@@/g, "# ") : "" : t)
+        .map(t => t.startsWith("network-logs-entry network-logs-entry--error@@@@") ? Config.includeApplicationMessage ? t.replace(/network-logs-entry network-logs-entry--error@@@@/g, "# ") : "" : t)
+        .map(t => t.startsWith("network-logs-entry network-logs-entry--tls@@@@") ? Config.includeConnectionProcessDetails ? t.replace(/network-logs-entry network-logs-entry--tls@@@@/g, "* ") : "" : t)
         .map(t => t.replace(/^network-logs-entry network-logs-entry--request@@@@/g, ""))
         .map(t => t.replace(/^network-logs-entry network-logs-entry--response@@@@/g, ""))
-        .map(t => t.startsWith("network-logs-entry network-logs-entry--info@@@@") ? Config.includeApplicationMessage ? t.replace(/network-logs-entry network-logs-entry--info@@@@/g, "# ") : "" : t)
-        .map(t => t.startsWith("network-logs-entry network-logs-entry--tls@@@@") ? Config.includeApplicationMessage ? t.replace(/network-logs-entry network-logs-entry--tls@@@@/g, "* ") : "" : t)
         .map(t => t.replace(/^network-logs-entry@@@@/g, ""))
+        .map(t => t.replace(/^network-logs-spacing@@@@$/g, "\n"))
         .filter(t => t !== "> ")
         .filter(t => t !== "")
-        .map(t => t.startsWith("mt-4") ? "" : t) // いらないかも
         .join("\n")
         .replace(/^\n/, "");
     },
