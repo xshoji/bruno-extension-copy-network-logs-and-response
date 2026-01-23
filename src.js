@@ -96,7 +96,7 @@
         .filter(t => t !== "> ")
         .filter(t => t !== "")
         .join("\n")
-        .replace(/^\n/, "");
+        .trim();
     },
 
     copyToClipboard: result => {
@@ -185,7 +185,7 @@
         const responseOutline = Array.from(document.evaluate('//*[not(contains(name(), "script")) and text() = "Network Logs"]', document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotItem(0).parentElement.nextElementSibling.children[0].children[0].children).map(e => e.innerText).join(", ")
         const responseBody = document.getElementsByClassName("collapsible-section")[1]?.querySelector(".CodeMirror")?.CodeMirror?.getValue() || "";
 
-        result.value += responseOutline + ", " + networkLogs + "\n" + responseBody + "\n";
+        result.value += responseOutline + ", " + networkLogs + "\n\n" + responseBody + "\n";
         result.value = result.value.replace(/\n{3,}/g, '\n\n');
 
         // Execute copy
