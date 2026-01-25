@@ -2,7 +2,7 @@
 
 This extension allows you to easily copy Bruno's network logs and responses to the clipboard.
 
-[demp.mp4](https://github.com/user-attachments/assets/916f0950-a339-42c0-8153-94ad5d11c21e)
+[demp.mp4](https://github.com/user-attachments/assets/9673247b-dde4-417e-bacc-240e735be0a6)
 
 
 
