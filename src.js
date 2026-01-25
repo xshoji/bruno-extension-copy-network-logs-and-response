@@ -9,7 +9,7 @@
     maskingLogFieldRegex: /([Cc]ookie:|[Aa]uthorization: Bearer|access_token|refresh_token|client_secret)(.*)/g,
 
     waitTimeForInitialization: 500,
-    buttonPosition: "Collections",
+    buttonPosition: "Dev Tools",
     buttonText: "Copy",
   };
 
@@ -68,10 +68,13 @@
 
     insertElementAtPosition: (element, referenceText) => {
       try {
-        const node = document.evaluate('//*[not(contains(name(), "script")) and contains(text(), "' + referenceText + '")]',
+        const node = document.evaluate('//*[not(contains(name(), "script")) and contains(text(), "' + referenceText + '") ]',
           document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotItem(0);
-        if (node?.parentNode) {
-          node.appendChild(element);
+
+        const targetElement = node?.parentNode?.parentNode;
+        const targetParent = targetElement?.parentNode;
+        if (targetParent && targetElement) {
+          targetParent.insertBefore(element, targetElement.nextSibling);
           return true;
         }
       } catch (e) { console.error("Failed to insert element:", e); }
