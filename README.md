@@ -27,7 +27,7 @@ This extension allows you to easily copy Bruno's network logs and responses to t
 ## Usage
 
 1. After installing the extension, wait 500 ms (initialization time)
-2. A "Copy" button will appear near the "Safe Mode" text on the Bruno screen
+2. A "Copy" button will appear near the "Dev Tools" text on the Bruno screen
 3. After executing an API request, open the "Timeline" tab in the right pane
 4. Click on the Timeline you want to copy from the history list to display its details
 5. Click the "Copy" button
@@ -54,10 +54,12 @@ You can modify the following settings in the Config object within the `src.js` f
 
 ```javascript
 const Config = {
-  waitTimeForInitialization: 500,  // Initialization wait time (milliseconds)
-  buttonPosition: "Safe Mode",      // Reference text for button placement
-  buttonText: "Copy",               // Button text
-  maskingLogFiledRegex: /([Cc]ookie:|[Aa]uthorization: Bearer|access_token|refresh_token|client_secret)(.*)/g  // Regular expression for masking targets
+  includeApplicationMessage: false,       // Whether to include application messages
+  includeConnectionProcessDetails: false, // Whether to include connection process details
+  waitTimeForInitialization: 500,         // Initialization wait time (milliseconds)
+  buttonPosition: "Dev Tools",            // Reference text for button placement
+  buttonText: "Copy",                     // Copy Button text
+  maskingLogFieldRegex: /([Cc]ookie:|[Aa]uthorization: Bearer|access_token|refresh_token|client_secret)(.*)/g                    // Regular expression for masking targets
 };
 ```
 
