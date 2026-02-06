@@ -6,15 +6,16 @@ set -euo pipefail
 #=============================================================================
 
 # --- Configuration ---
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BRUNO_REPO="https://github.com/usebruno/bruno.git"
 BRUNO_TAG="v3.0.2"
-PATCH_FILE="bruno-v3.0.2-userscript-feature.patch"
-BUILD_DIR="bruno-userscript-build"
+PATCH_FILE="$SCRIPT_DIR/bruno-v3.0.2-userscript-feature.patch"
+BUILD_DIR="$SCRIPT_DIR/bruno-userscript-build"
 USERSCRIPTS_APP_SUPPORT_DIR="$HOME/Library/Application Support/bruno/userscripts"
 
 # Userscripts to install (add paths here)
 USERSCRIPT_FILES=(
-  "src.js"
+  "$SCRIPT_DIR/src.js"
 )
 
 # --- Functions ---

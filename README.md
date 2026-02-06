@@ -36,7 +36,7 @@ This script will:
 3. Copy `src.js` to the userscripts directory (`~/Library/Application Support/bruno/userscripts/`)
 4. Build the Electron app
 
-The built app is output to `bruno-userscript-build/packages/bruno-electron/out/`.
+The built app is output to `bruno-userscript-build/packages/bruno-electron/out/` (e.g., `bruno-userscript-build/packages/bruno-electron/out/mac/Bruno.app` on macOS).
 
 With this approach, the userscript is loaded automatically every time Bruno starts — no manual steps required.
 
