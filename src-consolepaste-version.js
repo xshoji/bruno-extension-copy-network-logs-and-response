@@ -1,7 +1,7 @@
 (() => {
   // Configuration
   const Config = {
-    ExtensionName: "bruno-userscript-copy-button",
+    ExtensionName: "bruno-extension-copy-network-logs-and-response",
     setSeparator: "",
 
     includeApplicationMessage: false,
@@ -53,56 +53,6 @@
         console.error("Failed to click element:", e);
         return false;
       }
-    },
-
-    findTabByText: text => {
-      return Array.from(document.querySelectorAll('[role="tab"]'))
-        .find(el => el.textContent.trim() === text);
-    },
-
-    findMenuItemByText: text => {
-      return Array.from(document.querySelectorAll('[role="menuitem"]'))
-        .find(el => el.textContent.trim() === text);
-    },
-
-    clickTimelineTab: async () => {
-      // Case 1: Timeline tab is directly visible
-      const visibleTab = DomOperations.findTabByText("Timeline");
-      if (visibleTab) {
-        if (visibleTab.getAttribute("aria-selected") !== "true") {
-          visibleTab.click();
-          await Utils.wait(300);
-        }
-        return true;
-      }
-
-      // Case 2: Timeline tab is inside an overflow dropdown
-      // Find the .more-tabs nearest to a "Response" tab (= response pane)
-      const responseTab = DomOperations.findTabByText("Response");
-      const moreTabs = responseTab?.closest('[role="tablist"]')?.querySelector(".more-tabs");
-      if (moreTabs) {
-        moreTabs.click();
-        await Utils.wait(200);
-        const timelineMenuItem = DomOperations.findMenuItemByText("Timeline");
-        if (timelineMenuItem) {
-          timelineMenuItem.click();
-          await Utils.wait(300);
-          return true;
-        }
-      }
-      return false;
-    },
-
-    expandFirstTimelineItem: async () => {
-      const header = document.querySelector(".timeline-container .timeline-event .oauth-request-item-header");
-      if (header) {
-        const content = header.closest(".timeline-item")?.querySelector(".timeline-item-content");
-        if (!content) {
-          header.click();
-          await Utils.wait(300);
-        }
-      }
-      return !!header;
     },
 
     clickNetworkLogs: async () =>
@@ -227,10 +177,6 @@
       try {
         const result = { value: "" };
 
-        // Ensure Timeline tab is active and expand the first item
-        await DomOperations.clickTimelineTab();
-        await DomOperations.expandFirstTimelineItem();
-
         // Click Network Logs and get its content
         await DomOperations.clickNetworkLogs();
         await Utils.wait(100);
@@ -268,25 +214,13 @@
   };
 
   // Initialize the Extension
-  const initTimeout = setTimeout(() => {
+  setTimeout(() => {
     try {
-      const copyButton = createCopyButton();
+      createCopyButton();
       console.log(`${Config.ExtensionName} extension has just been initialized`);
-
-      // Return cleanup function
-      window.__brunoUserscriptCopyButtonCleanup = () => {
-        copyButton.remove();
-        console.log(`${Config.ExtensionName} cleaned up`);
-      };
     } catch (e) {
       console.error(`${Config.ExtensionName} extension initialization failed:`, e);
     }
   }, Config.waitTimeForInitialization);
 
-  // Return cleanup function
-  return () => {
-    clearTimeout(initTimeout);
-    window.__brunoUserscriptCopyButtonCleanup?.();
-    console.log(`${Config.ExtensionName} cleaned up`);
-  };
 })();
