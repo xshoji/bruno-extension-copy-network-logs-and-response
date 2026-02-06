@@ -1,8 +1,10 @@
-# bruno-extension-copy-network-logs-and-response
+# bruno-userscript-copy-network-logs-and-response
 
-This extension adds a "Copy" button to Bruno that copies network logs and response body to the clipboard with one click.
+This userscript adds a "Copy" button to Bruno that copies network logs and response body to the clipboard with one click.
 
-[demp.mp4](https://github.com/user-attachments/assets/9673247b-dde4-417e-bacc-240e735be0a6)
+[demp.mp4](https://github.com/user-attachments/assets/db0ddcd4-fd98-4748-b78f-a1986db63000)
+
+
 
 ## Features
 
@@ -14,7 +16,7 @@ This extension adds a "Copy" button to Bruno that copies network logs and respon
 
 **Note: This extension is unofficial and uses a forceful implementation. Use at your own risk.**
 
-### Option A: Build Bruno with userscript support (recommended)
+### Option A: Build Bruno with userscript support
 
 Build a customized Bruno (v3.0.2) that automatically loads userscripts on startup.
 
@@ -102,7 +104,7 @@ const Config = {
 
 ## Notes
 
-- This extension is unofficial and may stop working due to Bruno updates
+- This userscript and build script are unofficial and may stop working due to Bruno updates
 - When handling logs containing sensitive information, don't rely solely on the masking feature and verify the content before sharing
 
 ## License
