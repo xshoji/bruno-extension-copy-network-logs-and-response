@@ -93,28 +93,44 @@
       return false;
     },
 
-    expandFirstTimelineItem: async () => {
-      const header = document.querySelector(".timeline-container .timeline-event .oauth-request-item-header");
-      if (header) {
-        const content = header.closest(".timeline-item")?.querySelector(".timeline-item-content");
-        if (!content) {
-          header.click();
-          await Utils.wait(300);
-        }
-      }
-      return !!header;
+    getActiveTimelineItem: () => {
+      const items = document.querySelectorAll(".timeline-container .timeline-event .timeline-item");
+      const expanded = Array.from(items).find(item => item.querySelector(".timeline-item-content"));
+      return expanded || null;
     },
 
-    clickNetworkLogs: async () =>
-      DomOperations.clickElement({
-        xpath: '//*[not(contains(name(), "script")) and text() = "Network Logs"]'
-      }),
+    expandFirstTimelineItem: async () => {
+      const already = DomOperations.getActiveTimelineItem();
+      if (already) return already;
 
-    clickNetworkLogsPreviousElement: async () =>
-      DomOperations.clickElement({
-        xpath: '//*[not(contains(name(), "script")) and text() = "Network Logs"]',
-        getTarget: el => el.previousSibling
-      }),
+      const header = document.querySelector(".timeline-container .timeline-event .oauth-request-item-header");
+      if (header) {
+        header.click();
+        await Utils.wait(300);
+        return header.closest(".timeline-item") || null;
+      }
+      return null;
+    },
+
+    findNetworkLogsLabel: (scope) => {
+      const root = scope || document;
+      if (root.evaluate) {
+        return document.evaluate('.//*[not(contains(name(), "script")) and text() = "Network Logs"]', root, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotItem(0);
+      }
+      return Array.from(root.querySelectorAll("*")).find(el => el.childNodes.length === 1 && el.textContent === "Network Logs");
+    },
+
+    clickNetworkLogs: async (scope) => {
+      const el = DomOperations.findNetworkLogsLabel(scope);
+      if (el) { el.click(); await Utils.wait(100); }
+      return !!el;
+    },
+
+    clickNetworkLogsPreviousElement: async (scope) => {
+      const el = DomOperations.findNetworkLogsLabel(scope);
+      if (el?.previousSibling) { el.previousSibling.click(); await Utils.wait(100); }
+      return !!(el?.previousSibling);
+    },
 
     insertElementAtPosition: (element, referenceText) => {
       try {
@@ -134,8 +150,9 @@
 
   // Data processing functions
   const DataProcessor = {
-    getNetworkLogs: async () => {
-      return Array.from(document.getElementsByClassName("network-logs-pre")[0].children)
+    getNetworkLogs: async (scope) => {
+      const root = scope || document;
+      return Array.from(root.getElementsByClassName("network-logs-pre")[0].children)
         .flatMap(e => Array.from(e.children))
         .map(e => e.className + "@@@@" + e.textContent)
         .map(t => t.startsWith("network-logs-entry network-logs-entry--info@@@@Current time is") ? "Current time is " + Utils.formatDate(t.replace("network-logs-entry network-logs-entry--info@@@@Current time is ", "")) : t)
@@ -227,20 +244,24 @@
       try {
         const result = { value: "" };
 
-        // Ensure Timeline tab is active and expand the first item
+        // Ensure Timeline tab is active and get the active (or first) timeline item
         await DomOperations.clickTimelineTab();
-        await DomOperations.expandFirstTimelineItem();
+        const activeItem = await DomOperations.expandFirstTimelineItem();
+        const scope = activeItem?.querySelector(".timeline-item-content") || document;
 
         // Click Network Logs and get its content
-        await DomOperations.clickNetworkLogs();
+        await DomOperations.clickNetworkLogs(scope);
         await Utils.wait(100);
-        const networkLogs = await DataProcessor.getNetworkLogs();
+        const networkLogs = await DataProcessor.getNetworkLogs(scope);
 
         // Click Response and get its content
-        await DomOperations.clickNetworkLogsPreviousElement();
+        await DomOperations.clickNetworkLogsPreviousElement(scope);
         await Utils.wait(100);
-        const responseOutline = Array.from(document.evaluate('//*[not(contains(name(), "script")) and text() = "Network Logs"]', document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotItem(0).parentElement.nextElementSibling.children[0].children[0].children).map(e => e.innerText).join(", ")
-        const responseBody = document.getElementsByClassName("collapsible-section")[1]?.querySelector(".CodeMirror")?.CodeMirror?.getValue() || "";
+        const networkLogsLabel = DomOperations.findNetworkLogsLabel(scope);
+        const responseOutline = Array.from(networkLogsLabel.parentElement.nextElementSibling.children[0].children[0].children).map(e => e.innerText).join(", ")
+        const collapsibleSections = scope.querySelectorAll ? Array.from(scope.querySelectorAll(".collapsible-section")) : Array.from(document.getElementsByClassName("collapsible-section"));
+        const responseSection = collapsibleSections.length > 1 ? collapsibleSections[1] : collapsibleSections[0];
+        const responseBody = responseSection?.querySelector(".CodeMirror")?.CodeMirror?.getValue() || "";
 
         result.value += responseOutline + ", " + networkLogs + "\n\n" + responseBody + "\n";
         result.value = result.value.replace(/\n{3,}/g, '\n\n');
