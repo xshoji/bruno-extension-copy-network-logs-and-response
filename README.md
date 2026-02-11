@@ -98,7 +98,6 @@ const Config = {
 | File | Description |
 |------|-------------|
 | `src.js` | Userscript (for build with userscript support) |
-| `src-consolepaste-version.js` | Userscript (for pasting into DevTools console) |
 | `build-bruno-with-userscripts.sh` | Build automation script |
 | `bruno-v3.0.2-userscript-feature.patch` | Patch that adds userscript loading to Bruno v3.0.2 |
 
