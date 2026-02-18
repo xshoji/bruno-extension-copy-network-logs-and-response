@@ -1,5 +1,5 @@
 diff --git a/packages/bruno-electron/.gitignore b/packages/bruno-electron/.gitignore
-index 9faefe78..8567989e 100644
+index 9faefe7..8567989 100644
 --- a/packages/bruno-electron/.gitignore
 +++ b/packages/bruno-electron/.gitignore
 @@ -10,3 +10,6 @@ sectigo.*
@@ -10,7 +10,7 @@ index 9faefe78..8567989e 100644
 +# Userscripts directory (local customizations)
 +userscripts/
 diff --git a/packages/bruno-electron/src/app/apiSpecsWatcher.js b/packages/bruno-electron/src/app/apiSpecsWatcher.js
-index b8ce55a6..2139ed87 100644
+index b8ce55a..2139ed8 100644
 --- a/packages/bruno-electron/src/app/apiSpecsWatcher.js
 +++ b/packages/bruno-electron/src/app/apiSpecsWatcher.js
 @@ -141,6 +141,20 @@ class ApiSpecWatcher {
@@ -35,10 +35,10 @@ index b8ce55a6..2139ed87 100644
  
  module.exports = ApiSpecWatcher;
 diff --git a/packages/bruno-electron/src/app/collection-watcher.js b/packages/bruno-electron/src/app/collection-watcher.js
-index 52a2998a..d0bf1e3f 100644
+index 038ba01..863bfb4 100644
 --- a/packages/bruno-electron/src/app/collection-watcher.js
 +++ b/packages/bruno-electron/src/app/collection-watcher.js
-@@ -860,6 +860,20 @@ class CollectionWatcher {
+@@ -932,6 +932,20 @@ class CollectionWatcher {
        .filter(([path, watcher]) => !!watcher)
        .map(([path, _watcher]) => path);
    }
@@ -60,7 +60,7 @@ index 52a2998a..d0bf1e3f 100644
  
  const collectionWatcher = new CollectionWatcher();
 diff --git a/packages/bruno-electron/src/app/workspace-watcher.js b/packages/bruno-electron/src/app/workspace-watcher.js
-index f9c3d97c..de3b21a9 100644
+index 1cc38c8..7eab927 100644
 --- a/packages/bruno-electron/src/app/workspace-watcher.js
 +++ b/packages/bruno-electron/src/app/workspace-watcher.js
 @@ -224,6 +224,29 @@ class WorkspaceWatcher {
@@ -94,7 +94,7 @@ index f9c3d97c..de3b21a9 100644
  
  module.exports = WorkspaceWatcher;
 diff --git a/packages/bruno-electron/src/index.js b/packages/bruno-electron/src/index.js
-index c6b6e577..eecaf2f8 100644
+index 6cc1979..61c1af3 100644
 --- a/packages/bruno-electron/src/index.js
 +++ b/packages/bruno-electron/src/index.js
 @@ -56,6 +56,7 @@ const onboardUser = require('./app/onboarding');
@@ -105,7 +105,7 @@ index c6b6e577..eecaf2f8 100644
  
  const lastOpenedCollections = new LastOpenedCollections();
  const systemMonitor = new SystemMonitor();
-@@ -301,6 +302,45 @@ app.on('ready', async () => {
+@@ -391,6 +392,45 @@ app.on('ready', async () => {
      mainWindow.webContents.send('main:app-loaded', {
        isRunningInRosetta: getIsRunningInRosetta()
      });
@@ -151,7 +151,7 @@ index c6b6e577..eecaf2f8 100644
    });
  
    // register all ipc handlers
-@@ -317,6 +357,18 @@ app.on('ready', async () => {
+@@ -407,6 +447,18 @@ app.on('ready', async () => {
  
  // Quit the app once all windows are closed
  app.on('before-quit', () => {
@@ -167,10 +167,10 @@ index c6b6e577..eecaf2f8 100644
 +    `).catch(() => {});
 +  }
 +
-   try {
-     cookiesStore.saveCookieJar(true);
-   } catch (err) {
-@@ -331,6 +383,25 @@ app.on('before-quit', () => {
+   // Release single instance lock to allow other instances to take over
+   if (useSingleInstance && gotTheLock) {
+     app.releaseSingleInstanceLock();
+@@ -426,6 +478,25 @@ app.on('before-quit', () => {
    } catch (err) {
      console.error('Failed to kill all terminals on quit', err);
    }
@@ -198,7 +198,7 @@ index c6b6e577..eecaf2f8 100644
  app.on('window-all-closed', app.quit);
 diff --git a/packages/bruno-electron/src/utils/userscripts.js b/packages/bruno-electron/src/utils/userscripts.js
 new file mode 100644
-index 00000000..13c07589
+index 0000000..13c0758
 --- /dev/null
 +++ b/packages/bruno-electron/src/utils/userscripts.js
 @@ -0,0 +1,74 @@
